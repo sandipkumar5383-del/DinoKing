@@ -1,0 +1,948 @@
+
+/* ==============================
+   THE DINO KING - GLOBAL STYLES
+================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #f4f7f5;
+    background: #101820;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+
+    --bg: #101820;
+    --card: #1b2934;
+    --card-light: #243641;
+    --green: #69db7c;
+    --green-dark: #2f9e44;
+    --text: #f4f7f5;
+    --muted: #a5b4bc;
+    --border: #344955;
+    --red: #ff6b6b;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at top, #203a38 0%, transparent 45%),
+        var(--bg);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+}
+
+input {
+    width: 100%;
+    padding: 14px 16px;
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #111e27;
+    color: var(--text);
+    outline: none;
+}
+
+input::placeholder {
+    color: #74858e;
+}
+
+input:focus {
+    border-color: var(--green);
+}
+
+/* ==============================
+   APP LAYOUT
+================================ */
+
+#root {
+    min-height: 100vh;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 6%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+.brand span {
+    font-size: 30px;
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 40px 20px;
+}
+
+.app-footer,
+.start-footer {
+    padding: 20px;
+    color: var(--muted);
+    font-size: 11px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* ==============================
+   SHARED TEXT AND BUTTONS
+================================ */
+
+.eyebrow {
+    margin-bottom: 12px;
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+h1 {
+    margin-bottom: 16px;
+    font-size: clamp(28px, 5vw, 42px);
+    line-height: 1.15;
+}
+
+h2 {
+    font-size: 21px;
+}
+
+h3 {
+    margin: 22px 0 12px;
+    font-size: 15px;
+}
+
+p {
+    line-height: 1.65;
+}
+
+label {
+    display: block;
+    margin-top: 22px;
+    color: #dce5e8;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.play-button,
+.menu-button,
+.back-button,
+.copy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+}
+
+.play-button {
+    width: 100%;
+    margin-top: 22px;
+    border: 1px solid var(--green);
+    background: var(--green);
+    color: #102016;
+}
+
+.play-button:hover:not(:disabled) {
+    background: #8ce99a;
+    transform: translateY(-2px);
+}
+
+.menu-button {
+    border: 1px solid var(--border);
+    background: var(--card-light);
+    color: var(--text);
+}
+
+.menu-button:hover:not(:disabled) {
+    border-color: var(--green);
+}
+
+.back-button {
+    min-height: auto;
+    padding: 8px 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+}
+
+.back-button:hover:not(:disabled) {
+    color: var(--green);
+}
+
+.copy-button {
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--card-light);
+    color: var(--text);
+    font-size: 10px;
+}
+
+.error-message {
+    margin-top: 14px;
+    color: var(--red);
+    font-size: 13px;
+}
+
+/* ==============================
+   START MENU
+================================ */
+
+.start-menu {
+    width: 100%;
+    max-width: 560px;
+    text-align: center;
+}
+
+.start-card,
+.game-card,
+.character-card,
+.room-card,
+.lobby-card,
+.leaderboard-card,
+.game-over-card {
+    width: 100%;
+    padding: clamp(22px, 5vw, 40px);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: rgba(27, 41, 52, 0.96);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+}
+
+.game-logo {
+    margin-bottom: 14px;
+    font-size: 76px;
+    animation: dino-bounce 2s infinite ease-in-out;
+}
+
+.start-card h1 span {
+    display: block;
+    margin-top: 8px;
+    color: var(--green);
+}
+
+.start-description,
+.character-description,
+.room-description,
+.leaderboard-description,
+.game-over-description {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.start-card form {
+    margin-top: 20px;
+}
+
+.start-card .play-button {
+    margin-top: 16px;
+}
+
+.game-features {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* ==============================
+   MAIN MENU
+================================ */
+
+.game-card {
+    max-width: 460px;
+    text-align: center;
+}
+
+.game-card .dino {
+    margin-bottom: 12px;
+    font-size: 74px;
+}
+
+.game-card > p:not(.eyebrow) {
+    color: var(--muted);
+}
+
+.game-card .menu-button {
+    width: 100%;
+    margin-top: 12px;
+}
+
+/* ==============================
+   CHARACTER SELECTION
+================================ */
+
+.character-selection {
+    width: 100%;
+    max-width: 540px;
+}
+
+.character-card {
+    text-align: center;
+}
+
+.character-card .back-button,
+.room-card .back-button,
+.lobby-card .back-button,
+.leaderboard-card .back-button,
+.game-over-card .back-button {
+    display: flex;
+    margin-bottom: 24px;
+}
+
+.character-preview {
+    display: grid;
+    place-items: center;
+    width: 120px;
+    height: 120px;
+    margin: 24px auto;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: #111e27;
+}
+
+.character-preview span {
+    font-size: 68px;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.3));
+}
+
+.character-options {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.character-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 4px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #111e27;
+    color: var(--text);
+}
+
+.character-option span {
+    font-size: 34px;
+}
+
+.character-option small {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.character-option:hover,
+.character-option.selected {
+    border-color: var(--green);
+    background: #203a30;
+}
+
+.color-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.color-option {
+    width: 32px;
+    height: 32px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+}
+
+.color-option.selected {
+    border-color: white;
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+}
+
+/* ==============================
+   CREATE ROOM / JOIN ROOM
+================================ */
+
+.create-room,
+.join-room {
+    width: 100%;
+    max-width: 470px;
+}
+
+.room-card {
+    text-align: center;
+}
+
+.room-card label {
+    text-align: left;
+}
+
+.room-icon {
+    margin-bottom: 12px;
+    font-size: 55px;
+}
+
+.room-card .play-button {
+    margin-top: 24px;
+}
+
+/* ==============================
+   LOBBY
+================================ */
+
+.lobby {
+    width: 100%;
+    max-width: 560px;
+}
+
+.lobby-card {
+    text-align: center;
+}
+
+.room-code-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 26px 0;
+    padding: 22px;
+    border: 1px dashed var(--green);
+    border-radius: 14px;
+    background: #14251f;
+}
+
+.room-code-box > span {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.room-code-box strong {
+    color: var(--green);
+    font-size: 34px;
+    letter-spacing: 7px;
+}
+
+.lobby-players-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+.lobby-players-heading span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.lobby-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lobby-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #14212b;
+    text-align: left;
+}
+
+.lobby-player-avatar {
+    font-size: 30px;
+}
+
+.lobby-player-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lobby-player-info strong {
+    font-size: 13px;
+}
+
+.lobby-player-info small {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.player-ready {
+    color: var(--green);
+    font-size: 11px;
+}
+
+.waiting-message,
+.lobby-tip {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* ==============================
+   GAME SCREEN
+================================ */
+
+.game-screen {
+    width: 100%;
+    max-width: 900px;
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.game-header h1 {
+    margin-bottom: 0;
+}
+
+.score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+}
+
+.score-display span {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.score-display strong {
+    color: var(--green);
+    font-size: 25px;
+}
+
+.game-canvas-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #172733;
+}
+
+.game-canvas-wrapper canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    touch-action: manipulation;
+}
+
+.game-instructions {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.game-over-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    background: rgba(12, 22, 29, 0.94);
+    text-align: center;
+}
+
+.game-over-overlay h2 {
+    color: var(--red);
+    font-size: 34px;
+}
+
+.game-over-overlay p {
+    color: var(--muted);
+}
+
+.game-over-overlay .play-button,
+.game-over-overlay .back-button {
+    width: min(100%, 260px);
+    margin: 0;
+}
+
+/* ==============================
+   LEADERBOARD
+================================ */
+
+.leaderboard-page {
+    width: 100%;
+    max-width: 650px;
+}
+
+.leaderboard-card {
+    text-align: center;
+}
+
+.leaderboard-icon {
+    margin-bottom: 12px;
+    font-size: 55px;
+}
+
+.leaderboard-message {
+    margin: 24px 0;
+    color: var(--muted);
+}
+
+.leaderboard-table-wrapper {
+    overflow-x: auto;
+    margin-top: 26px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.leaderboard-table th {
+    background: #14212b;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.leaderboard-table td {
+    font-size: 13px;
+}
+
+.leaderboard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.leaderboard-table tbody tr.top-player {
+    background: rgba(105, 219, 124, 0.06);
+}
+
+.leaderboard-player {
+    white-space: nowrap;
+}
+
+.leaderboard-score {
+    color: var(--green);
+    font-weight: 800;
+    text-align: right;
+}
+
+/* ==============================
+   GAME OVER
+================================ */
+
+.game-over-page {
+    width: 100%;
+    max-width: 560px;
+}
+
+.game-over-card {
+    text-align: center;
+}
+
+.game-over-icon {
+    margin-bottom: 12px;
+    font-size: 70px;
+}
+
+.final-score-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 26px 0 18px;
+    padding: 22px;
+    border: 1px solid var(--green);
+    border-radius: 15px;
+    background: #14251f;
+}
+
+.final-score-box span {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.final-score-box strong {
+    color: var(--green);
+    font-size: 42px;
+}
+
+.game-over-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 18px 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #14212b;
+}
+
+.stat-box span {
+    font-size: 24px;
+}
+
+.stat-box small {
+    color: var(--muted);
+}
+
+.stat-box strong {
+    color: var(--green);
+    font-size: 20px;
+}
+
+.final-results {
+    margin-top: 28px;
+    text-align: left;
+}
+
+.final-results h2 {
+    margin-bottom: 14px;
+}
+
+.result-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #14212b;
+}
+
+.result-rank {
+    min-width: 35px;
+}
+
+.result-name {
+    flex: 1;
+    font-size: 12px;
+}
+
+.result-score {
+    color: var(--green);
+}
+
+.current-player {
+    border-color: var(--green);
+    background: #203a30;
+}
+
+.game-over-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.game-over-actions .play-button,
+.game-over-actions .menu-button {
+    width: 100%;
+    margin: 0;
+}
+
+.game-over-footer {
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+}
+
+/* ==============================
+   ANIMATIONS
+================================ */
+
+@keyframes dino-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 600px) {
+    .topbar {
+        padding: 15px 4%;
+    }
+
+    .brand {
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    .brand span {
+        font-size: 24px;
+    }
+
+    .topbar .menu-button {
+        min-height: 38px;
+        padding: 9px 10px;
+        font-size: 10px;
+    }
+
+    .main-content {
+        padding: 24px 14px;
+    }
+
+    .start-card,
+    .game-card,
+    .character-card,
+    .room-card,
+    .lobby-card,
+    .leaderboard-card,
+    .game-over-card {
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
+
+    .game-features {
+        gap: 10px;
+        font-size: 10px;
+    }
+
+    .character-options {
+        gap: 6px;
+    }
+
+    .character-option {
+        padding: 10px 2px;
+    }
+
+    .character-option span {
+        font-size: 28px;
+    }
+
+    .room-code-box strong {
+        font-size: 27px;
+        letter-spacing: 5px;
+    }
+
+    .game-header {
+        align-items: flex-start;
+    }
+
+    .game-header h1 {
+        font-size: 25px;
+    }
+
+    .score-display {
+        padding: 10px 12px;
+    }
+
+    .score-display strong {
+        font-size: 20px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 12px 8px;
+        font-size: 11px;
+    }
+
+    .final-score-box strong {
+        font-size: 34px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
