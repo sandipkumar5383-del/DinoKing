@@ -1,0 +1,458 @@
+
+/* THE DINO KING - SETTINGS PAGE */
+
+.settings-page {
+    width: 100%;
+    min-height: 100%;
+    padding: 30px 20px;
+    color: #f4f7f5;
+    background: #101820;
+    box-sizing: border-box;
+}
+
+.settings-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 28px;
+    box-sizing: border-box;
+    background: #192832;
+    border: 1px solid #344955;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Header */
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 24px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #344955;
+}
+
+.settings-back,
+.settings-footer-back {
+    padding: 11px 16px;
+    border: 1px solid #405562;
+    border-radius: 9px;
+    background: #243641;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.settings-back:hover,
+.settings-footer-back:hover {
+    background: #344955;
+    border-color: #69db7c;
+}
+
+.settings-heading {
+    flex: 1;
+}
+
+.settings-icon {
+    font-size: 30px;
+}
+
+.settings-eyebrow {
+    margin: 6px 0;
+    color: #69db7c;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.settings-heading h1 {
+    margin: 5px 0;
+    font-size: clamp(25px, 4vw, 34px);
+    color: #fff;
+}
+
+.settings-heading > p:last-child {
+    margin: 8px 0 0;
+    color: #a9bac4;
+}
+
+/* Sections */
+
+.settings-section {
+    margin-bottom: 22px;
+    padding: 22px;
+    background: #202f39;
+    border: 1px solid #344955;
+    border-radius: 15px;
+}
+
+.settings-section h2 {
+    margin: 0 0 22px;
+    color: #69db7c;
+    font-size: 19px;
+}
+
+.settings-label {
+    display: block;
+    margin: 17px 0 9px;
+    color: #eaf0f2;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Text inputs and dropdowns */
+
+.settings-input {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    border: 1px solid #405562;
+    border-radius: 9px;
+    outline: none;
+    background: #111e27;
+    color: #fff;
+    font: inherit;
+}
+
+.settings-input:focus {
+    border-color: #69db7c;
+    box-shadow: 0 0 0 3px rgba(105, 219, 124, 0.12);
+}
+
+.settings-input option {
+    background: #192832;
+    color: #fff;
+}
+
+/* Character selection */
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.character-option {
+    display: flex;
+    min-height: 100px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 12px 8px;
+    border: 1px solid #405562;
+    border-radius: 12px;
+    background: #111e27;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.character-option span {
+    font-size: 35px;
+}
+
+.character-option small {
+    color: #c4d0d6;
+    font-size: 12px;
+}
+
+.character-option:hover,
+.character-option.selected {
+    border-color: #69db7c;
+    background: #203a30;
+    transform: translateY(-2px);
+}
+
+.character-option.selected {
+    box-shadow: 0 0 0 2px rgba(105, 219, 124, 0.15);
+}
+
+/* Character colors */
+
+.color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 13px;
+    margin-top: 12px;
+}
+
+.color-option {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border: 3px solid #202f39;
+    border-radius: 50%;
+    outline: 1px solid #50616b;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.12);
+}
+
+.color-option.selected {
+    border-color: #202f39;
+    outline: 3px solid #69db7c;
+}
+
+/* Character preview */
+
+.character-preview {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 24px;
+    padding: 18px;
+    border: 1px solid #405562;
+    border-radius: 12px;
+    background: #111e27;
+}
+
+.preview-character {
+    font-size: 55px;
+}
+
+.character-preview strong {
+    font-size: 18px;
+}
+
+.character-preview p {
+    margin: 6px 0 0;
+    color: #a9bac4;
+    font-size: 13px;
+}
+
+/* Toggle rows */
+
+.settings-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 18px 0;
+    padding: 15px;
+    border: 1px solid #344955;
+    border-radius: 10px;
+    background: #17252e;
+    cursor: pointer;
+}
+
+.settings-toggle span {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.settings-toggle strong {
+    color: #f4f7f5;
+    font-size: 14px;
+}
+
+.settings-toggle small {
+    color: #a9bac4;
+    font-size: 12px;
+}
+
+.settings-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: #69db7c;
+    cursor: pointer;
+}
+
+/* Volume sliders */
+
+.settings-range {
+    display: block;
+    width: 100%;
+    margin: 12px 0 20px;
+    accent-color: #69db7c;
+    cursor: pointer;
+}
+
+/* Notes */
+
+.settings-note {
+    margin: 18px 0 0;
+    padding: 12px;
+    border-left: 3px solid #69db7c;
+    background: #17252e;
+    color: #a9bac4;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Save and reset */
+
+.settings-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.settings-actions button {
+    flex: 1;
+    min-height: 46px;
+    padding: 12px 18px;
+    border: 1px solid #405562;
+    border-radius: 10px;
+    background: #243641;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.settings-actions button:hover {
+    border-color: #69db7c;
+    transform: translateY(-1px);
+}
+
+.settings-actions .settings-save {
+    border-color: #69db7c;
+    background: #69db7c;
+    color: #102016;
+}
+
+.settings-actions .settings-save:hover {
+    background: #8ce99a;
+}
+
+.settings-message {
+    margin: 0 0 20px;
+    padding: 13px 16px;
+    border: 1px solid #69db7c;
+    border-radius: 9px;
+    background: #203a30;
+    color: #8ce99a;
+    font-size: 14px;
+}
+
+.settings-footer-back {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Light theme */
+
+.settings-page.theme-light {
+    background: #edf2f5;
+    color: #1b2934;
+}
+
+.settings-page.theme-light .settings-container {
+    background: #fff;
+    border-color: #d5dfe5;
+}
+
+.settings-page.theme-light .settings-heading h1,
+.settings-page.theme-light .settings-section h2,
+.settings-page.theme-light .settings-toggle strong,
+.settings-page.theme-light .character-preview strong {
+    color: #1b2934;
+}
+
+.settings-page.theme-light .settings-heading > p:last-child,
+.settings-page.theme-light .settings-label,
+.settings-page.theme-light .character-preview p {
+    color: #536672;
+}
+
+.settings-page.theme-light .settings-section {
+    background: #f7f9fa;
+    border-color: #d5dfe5;
+}
+
+.settings-page.theme-light .settings-input,
+.settings-page.theme-light .character-option,
+.settings-page.theme-light .character-preview {
+    background: #fff;
+    color: #1b2934;
+    border-color: #d5dfe5;
+}
+
+.settings-page.theme-light .character-option small {
+    color: #536672;
+}
+
+.settings-page.theme-light .settings-toggle,
+.settings-page.theme-light .settings-note {
+    background: #edf2f5;
+    border-color: #d5dfe5;
+}
+
+.settings-page.theme-light .settings-toggle strong {
+    color: #1b2934;
+}
+
+.settings-page.theme-light .settings-toggle small,
+.settings-page.theme-light .settings-note {
+    color: #536672;
+}
+
+.settings-page.theme-light .settings-actions button,
+.settings-page.theme-light .settings-back,
+.settings-page.theme-light .settings-footer-back {
+    background: #e5ecef;
+    color: #1b2934;
+}
+
+.settings-page.theme-light .settings-actions .settings-save {
+    background: #69db7c;
+    color: #102016;
+}
+
+/* Responsive design */
+
+@media (max-width: 600px) {
+    .settings-page {
+        padding: 15px 10px;
+    }
+
+    .settings-container {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .settings-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .settings-heading {
+        flex-basis: 100%;
+        order: 2;
+    }
+
+    .settings-back {
+        order: 1;
+    }
+
+    .settings-section {
+        padding: 15px;
+    }
+
+    .character-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .settings-actions {
+        flex-direction: column;
+    }
+
+    .settings-actions button {
+        width: 100%;
+    }
+}

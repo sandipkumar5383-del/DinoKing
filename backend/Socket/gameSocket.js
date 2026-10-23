@@ -5,7 +5,6 @@ const Score = require("../Models/ScoreModel");
 const crypto = require("crypto");
 
 module.exports = (io) => {
-    // Runtime game state is stored by room code.
     const activeRooms = new Map();
 
     const sendReply = (callback, data) => {
@@ -18,9 +17,11 @@ module.exports = (io) => {
         typeof code === "string" ? code.trim().toUpperCase() : "";
 
     const createRuntimeRoom = (roomCode) => ({
+        roomCode,
         players: new Map(),
         sessionId: null,
-        gameOver: false
+        gameOver: false,
+        started: false
     });
 
     const syncRuntimePlayers = (roomCode, room) => {
@@ -40,7 +41,8 @@ module.exports = (io) => {
                 runtime.players.set(`stored-${player.playerId}`, {
                     playerId: player.playerId,
                     name: player.name,
-                    color: player.color,
+                    character: player.character || "🦖",
+                    color: player.color || "#69db7c",
                     score: player.score || 0,
                     x: 80,
                     y: 0,
@@ -59,9 +61,13 @@ module.exports = (io) => {
         // CREATE ROOM
         socket.on("createRoom", async (data, callback) => {
             try {
-                console.log("CREATE ROOM REQUEST:", data);
-
-                const { playerId, name, color, roomName } = data || {};
+                const {
+                    playerId,
+                    name,
+                    color,
+                    character,
+                    roomName
+                } = data || {};
 
                 if (!playerId || !name) {
                     return sendReply(callback, {
@@ -69,6 +75,9 @@ module.exports = (io) => {
                         message: "Player ID and name are required."
                     });
                 }
+
+                const selectedCharacter = character || "🦖";
+                const selectedColor = color || "#69db7c";
 
                 const roomCode = crypto
                     .randomBytes(4)
@@ -84,7 +93,8 @@ module.exports = (io) => {
                         {
                             playerId,
                             name,
-                            color: color || "#69db7c",
+                            character: selectedCharacter,
+                            color: selectedColor,
                             score: 0,
                             status: "Ready"
                         }
@@ -103,7 +113,8 @@ module.exports = (io) => {
                 runtime.players.set(socket.id, {
                     playerId,
                     name,
-                    color: color || "#69db7c",
+                    character: selectedCharacter,
+                    color: selectedColor,
                     score: 0,
                     x: 80,
                     y: 0,
@@ -113,8 +124,6 @@ module.exports = (io) => {
 
                 activeRooms.set(roomCode, runtime);
 
-                console.log("ROOM CREATED:", roomCode);
-
                 sendReply(callback, {
                     success: true,
                     roomCode,
@@ -122,6 +131,7 @@ module.exports = (io) => {
                 });
 
                 io.to(roomCode).emit("roomUpdated", room);
+                console.log("ROOM CREATED:", roomCode);
             } catch (error) {
                 console.error("CREATE ROOM ERROR:", error);
 
@@ -135,7 +145,14 @@ module.exports = (io) => {
         // JOIN ROOM
         socket.on("joinRoom", async (data, callback) => {
             try {
-                const { roomCode, playerId, name, color } = data || {};
+                const {
+                    roomCode,
+                    playerId,
+                    name,
+                    color,
+                    character
+                } = data || {};
+
                 const code = normalizeCode(roomCode);
 
                 if (!code || !playerId || !name) {
@@ -161,19 +178,36 @@ module.exports = (io) => {
                     });
                 }
 
-                const existingPlayer = room.players.find(
+                let existingPlayer = room.players.find(
                     (p) => p.playerId === playerId
                 );
+
+                const selectedCharacter =
+                    character || existingPlayer?.character || "🦖";
+
+                const selectedColor =
+                    color || existingPlayer?.color || "#69db7c";
 
                 if (!existingPlayer) {
                     room.players.push({
                         playerId,
                         name,
-                        color: color || "#69db7c",
+                        character: selectedCharacter,
+                        color: selectedColor,
                         score: 0,
                         status: "Ready"
                     });
 
+                    await room.save();
+
+                    existingPlayer = room.players.find(
+                        (p) => p.playerId === playerId
+                    );
+                } else {
+                    // Refresh the saved customization for this player.
+                    existingPlayer.name = name;
+                    existingPlayer.character = selectedCharacter;
+                    existingPlayer.color = selectedColor;
                     await room.save();
                 }
 
@@ -185,7 +219,6 @@ module.exports = (io) => {
 
                 const runtime = syncRuntimePlayers(code, room);
 
-                // Replace any stored placeholder with the connected socket.
                 for (const [key, player] of runtime.players.entries()) {
                     if (
                         key !== socket.id &&
@@ -198,15 +231,14 @@ module.exports = (io) => {
                 runtime.players.set(socket.id, {
                     playerId,
                     name,
-                    color: color || "#69db7c",
+                    character: selectedCharacter,
+                    color: selectedColor,
                     score: existingPlayer?.score || 0,
                     x: 80,
                     y: 0,
                     jumping: false,
                     alive: true
                 });
-
-                console.log(`${name} joined room ${code}`);
 
                 sendReply(callback, {
                     success: true,
@@ -215,6 +247,7 @@ module.exports = (io) => {
                 });
 
                 io.to(code).emit("roomUpdated", room);
+                console.log(`${name} joined room ${code}`);
             } catch (error) {
                 console.error("JOIN ROOM ERROR:", error);
 
@@ -225,70 +258,63 @@ module.exports = (io) => {
             }
         });
 
-        // START GAME - ROOM OWNER ONLY
-      
+        // START GAME
+        socket.on("startGame", async ({ roomCode } = {}, callback) => {
+            try {
+                const code = normalizeCode(roomCode);
+                const runtime = activeRooms.get(code);
 
-socket.on("startGame", ({ roomCode } = {}, callback) => {
-    const reply = (result) => {
-        if (typeof callback === "function") {
-            callback(result);
-        }
-    };
+                if (!runtime) {
+                    return sendReply(callback, {
+                        success: false,
+                        message: "Room not found. Create or join a room again."
+                    });
+                }
 
-    try {
-        const code = roomCode?.trim().toUpperCase();
-        const room = activeRooms.get(code);
+                if (runtime.gameOver) {
+                    return sendReply(callback, {
+                        success: false,
+                        message: "This game has finished. Reset the game first."
+                    });
+                }
 
-        console.log("START GAME REQUEST:", code);
-        console.log("ROOM FOUND:", Boolean(room));
+                if (runtime.started) {
+                    return sendReply(callback, {
+                        success: true,
+                        roomCode: code
+                    });
+                }
 
-        if (!room) {
-            reply({
-                success: false,
-                message: "Room not found. Create a new room."
-            });
-            return;
-        }
+                runtime.started = true;
 
-        if (room.gameOver) {
-            reply({
-                success: false,
-                message: "This game has finished. Create a new room."
-            });
-            return;
-        }
+                const room = await GameRoom.findOne({ roomCode: code });
 
-        // Allow the owner to continue to the game if it already started.
-        if (room.started) {
-            reply({
-                success: true,
-                roomCode: code
-            });
-            return;
-        }
+                if (room) {
+                    room.status = "playing";
+                    room.players.forEach((p) => {
+                        p.status = "Playing";
+                    });
+                    await room.save();
+                    io.to(code).emit("roomUpdated", room);
+                }
 
-        room.started = true;
+                io.to(code).emit("gameStarted", { roomCode: code });
 
-        io.to(code).emit("gameStarted", {
-            roomCode: code
+                sendReply(callback, {
+                    success: true,
+                    roomCode: code
+                });
+
+                console.log("GAME STARTED:", code);
+            } catch (error) {
+                console.error("START GAME ERROR:", error);
+
+                sendReply(callback, {
+                    success: false,
+                    message: error.message || "Unable to start the game."
+                });
+            }
         });
-
-        reply({
-            success: true,
-            roomCode: code
-        });
-
-        console.log("GAME START ACKNOWLEDGED:", code);
-    } catch (error) {
-        console.error("START GAME ERROR:", error);
-
-        reply({
-            success: false,
-            message: "Unable to start the game."
-        });
-    }
-});
-
 
         // PLAYER MOVEMENT
         socket.on("playerMove", (data) => {
@@ -363,63 +389,60 @@ socket.on("startGame", ({ roomCode } = {}, callback) => {
                 });
             }
         });
-        
-const handlePlayAgain = () => {
-  if (!socket || !roomCode) {
-    console.error("Socket connection or room code is missing.");
-    setScreen("menu");
-    return;
-  }
-};
 
- socket.on("resetGame", async ({ roomCode } = {}, callback) => {
-    console.log("RESET GAME REQUEST RECEIVED:", roomCode);
+        // RESET GAME
+        socket.on("resetGame", async ({ roomCode } = {}, callback) => {
+            try {
+                const code = normalizeCode(roomCode);
+                const runtime = activeRooms.get(code);
 
-    try {
-        const code = String(roomCode || "").trim().toUpperCase();
-        const runtime = activeRooms.get(code);
+                if (!runtime) {
+                    return sendReply(callback, {
+                        success: false,
+                        message: "Room not found. Create or join the room again."
+                    });
+                }
 
-        if (!runtime) {
-            return callback?.({
-                success: false,
-                message: "Room not found."
-            });
-        }
+                // Reset runtime state without deleting player customizations.
+                runtime.started = false;
+                runtime.gameOver = false;
+                runtime.sessionId = null;
 
-        runtime.started = false;
-        runtime.gameOver = false;
-        runtime.sessionId = null;
+                runtime.players.forEach((player) => {
+                    player.score = 0;
+                    player.alive = true;
+                    player.x = 80;
+                    player.y = 0;
+                    player.jumping = false;
+                });
 
-        runtime.players.forEach((player) => {
-            player.score = 0;
+                const room = await GameRoom.findOne({ roomCode: code });
+
+                if (room) {
+                    room.status = "lobby";
+
+                    room.players.forEach((player) => {
+                        player.score = 0;
+                        player.status = "Ready";
+                    });
+
+                    await room.save();
+                    io.to(code).emit("roomUpdated", room.toObject());
+                }
+
+                sendReply(callback, { success: true });
+                console.log("RESET GAME SUCCESS:", code);
+            } catch (error) {
+                console.error("RESET GAME ERROR:", error);
+
+                sendReply(callback, {
+                    success: false,
+                    message: error.message || "Unable to reset game."
+                });
+            }
         });
 
-        const room = await GameRoom.findOne({ roomCode: code });
-
-        if (room) {
-            room.status = "lobby";
-
-            room.players.forEach((player) => {
-                player.score = 0;
-                player.status = "Ready";
-            });
-
-            await room.save();
-            io.to(code).emit("roomUpdated", room.toObject());
-        }
-
-        console.log("RESET GAME SUCCESS:", code);
-        callback?.({ success: true });
-    } catch (error) {
-        console.error("RESET GAME ERROR:", error);
-        callback?.({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-        // GAME OVER - FINISH ROOM SESSION
+        // GAME OVER
         socket.on("gameOver", async (data, callback) => {
             try {
                 const code = normalizeCode(data?.roomCode);
@@ -446,7 +469,6 @@ const handlePlayAgain = () => {
                     });
                 }
 
-                // This implementation ends the whole room session.
                 const players = [...runtime.players.values()].sort(
                     (a, b) => b.score - a.score
                 );
@@ -454,34 +476,36 @@ const handlePlayAgain = () => {
                 const results = players.map((player, index) => ({
                     playerId: player.playerId,
                     playerName: player.name,
-                    score: player.score,
+                    character: player.character || "🦖",
+                    color: player.color || "#69db7c",
+                    status: "Dead",
+                    score: Number(player.score) || 0,
                     rank: index + 1
                 }));
 
-                // Persist results before marking the room finished.
-                
-const scoreDocuments = results.map((result) => ({
-    roomCode: code,
-    sessionId: runtime.sessionId || undefined,
-    playerId: result.playerId,
-    playerName: result.playerName,
-    score: Number(result.score) || 0,
-    rank: result.rank
-}));
+                const scoreDocuments = players.map((player, index) => ({
+                    roomCode: code,
+                    sessionId: runtime.sessionId || undefined,
+                    playerId: player.playerId,
+                    playerName: player.name,
+                    character: player.character || "🦖",
+                    color: player.color || "#69db7c",
+                    status: "Dead",
+                    score: Number(player.score) || 0,
+                    rank: index + 1
+                }));
 
-// Save scores even if a session ID was not created.
-await Score.insertMany(scoreDocuments);
+                await Score.insertMany(scoreDocuments);
 
-if (runtime.sessionId) {
-    await GameSession.findByIdAndUpdate(
-        runtime.sessionId,
-        {
-            endedAt: new Date(),
-            status: "finished"
-        }
-    );
-}
-
+                if (runtime.sessionId) {
+                    await GameSession.findByIdAndUpdate(
+                        runtime.sessionId,
+                        {
+                            endedAt: new Date(),
+                            status: "finished"
+                        }
+                    );
+                }
 
                 const room = await GameRoom.findOne({ roomCode: code });
 
@@ -493,10 +517,10 @@ if (runtime.sessionId) {
                             (item) => item.playerId === dbPlayer.playerId
                         );
 
-                        if (result) dbPlayer.score = result.score;
-
-                        // GameRoomModel only allows Ready, Playing, Dead.
-                        // Do not assign an unsupported "Finished" status.
+                        if (result) {
+                            dbPlayer.score = result.score;
+                            dbPlayer.status = "Dead";
+                        }
                     });
 
                     await room.save();
@@ -513,6 +537,8 @@ if (runtime.sessionId) {
                     success: true,
                     players: results
                 });
+
+                console.log("GAME OVER:", code);
             } catch (error) {
                 console.error("GAME OVER ERROR:", error);
 
@@ -616,4 +642,3 @@ if (runtime.sessionId) {
         });
     });
 };
-

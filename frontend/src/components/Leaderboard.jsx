@@ -12,56 +12,63 @@ function Leaderboard({ onBack }) {
     useEffect(() => {
         let cancelled = false;
 
-        const fetchLeaderboard = async () => {
+        async function loadLeaderboard() {
             try {
-                setLoading(true);
-                setError("");
-
                 const response = await axios.get(
                     `${API_URL}/leaderboard`
                 );
 
                 if (cancelled) return;
 
-                // Support both an array and { success, scores }.
                 const data = Array.isArray(response.data)
                     ? response.data
-                    : Array.isArray(response.data?.scores)
-                    ? response.data.scores
-                    : [];
+                    : response.data?.scores || [];
 
-                const sortedPlayers = [...data].sort(
+                const sorted = [...data].sort(
                     (a, b) =>
                         Number(b.score || 0) -
                         Number(a.score || 0)
                 );
 
-                setPlayers(sortedPlayers);
+                setPlayers(sorted);
+                setError("");
             } catch (err) {
                 if (!cancelled) {
-                    console.error(
-                        "Leaderboard fetch error:",
-                        err
-                    );
-
                     setError(
                         err.response?.data?.message ||
-                        "Unable to load leaderboard. Please check your server."
+                        "Unable to load leaderboard."
                     );
                 }
             } finally {
-                if (!cancelled) {
-                    setLoading(false);
-                }
+                if (!cancelled) setLoading(false);
             }
-        };
+        }
 
-        fetchLeaderboard();
+        loadLeaderboard();
 
         return () => {
             cancelled = true;
         };
     }, []);
+
+    const getStatus = (player) => {
+        const value = String(
+            player.status || player.playerStatus || ""
+        ).toLowerCase();
+
+        if (value === "playing") return "Playing";
+        if (value === "dead") return "Dead";
+        if (value === "ready") return "Ready";
+        return "Unknown";
+    };
+
+    const playingCount = players.filter(
+        (p) => getStatus(p) === "Playing"
+    ).length;
+
+    const deadCount = players.filter(
+        (p) => getStatus(p) === "Dead"
+    ).length;
 
     return (
         <div className="leaderboard-page">
@@ -75,15 +82,11 @@ function Leaderboard({ onBack }) {
                 </button>
 
                 <div className="leaderboard-icon">🏆</div>
-
-                <p className="eyebrow">
-                    THE DINO KING CHAMPIONS
-                </p>
-
+                <p className="eyebrow">THE DINO KING CHAMPIONS</p>
                 <h1>Leaderboard</h1>
 
                 <p className="leaderboard-description">
-                    The fastest runners with the highest scores.
+                    Choose your character. Run to rule!
                 </p>
 
                 {loading && (
@@ -93,68 +96,111 @@ function Leaderboard({ onBack }) {
                 )}
 
                 {!loading && error && (
-                    <p className="error-message" role="alert">
-                        {error}
-                    </p>
+                    <p className="error-message">{error}</p>
                 )}
 
-                {!loading && !error && players.length === 0 && (
-                    <p className="leaderboard-message">
-                        No scores yet. Play a game to become the
-                        first champion!
-                    </p>
-                )}
+                {!loading && !error && (
+                    <>
+                        <div className="player-counts">
+                            <div className="player-count-card">
+                                <h2>{players.length}</h2>
+                                <p>Total Players</p>
+                            </div>
 
-                {!loading && !error && players.length > 0 && (
-                    <div className="leaderboard-table-wrapper">
-                        <table className="leaderboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Player</th>
-                                    <th>Score</th>
-                                </tr>
-                            </thead>
+                            <div className="player-count-card">
+                                <h2>{playingCount}</h2>
+                                <p>Playing</p>
+                            </div>
 
-                            <tbody>
-                                {players.map((item, index) => (
-                                    <tr
-                                        key={
-                                            item._id ||
-                                            `${item.playerId || "player"}-${index}`
-                                        }
-                                        className={
-                                            index < 3
-                                                ? "top-player"
-                                                : ""
-                                        }
-                                    >
-                                        <td>
-                                            {index === 0
-                                                ? "🥇"
-                                                : index === 1
-                                                ? "🥈"
-                                                : index === 2
-                                                ? "🥉"
-                                                : index + 1}
-                                        </td>
+                            <div className="player-count-card">
+                                <h2>{deadCount}</h2>
+                                <p>Dead</p>
+                            </div>
+                        </div>
 
-                                        <td>
-                                            <span className="leaderboard-player">
-                                                🦖 {item.playerName || "Player"}
-                                            </span>
-                                        </td>
+                        {players.length === 0 ? (
+                            <p className="leaderboard-message">
+                                No scores available yet.
+                            </p>
+                        ) : (
+                            <div className="leaderboard-table-wrapper">
+                                <table className="leaderboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Player</th>
+                                            <th>Score</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
 
-                                        <td className="leaderboard-score">
-                                            {Number(
-                                                item.score || 0
-                                            ).toLocaleString()}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                    <tbody>
+                                        {players.map((item, index) => {
+                                            const status = getStatus(item);
+
+                                            return (
+                                                <tr
+                                                    key={
+                                                        item._id ||
+                                                        item.playerId ||
+                                                        index
+                                                    }
+                                                >
+                                                    <td>
+                                                        {index === 0
+                                                            ? "🥇"
+                                                            : index === 1
+                                                            ? "🥈"
+                                                            : index === 2
+                                                            ? "🥉"
+                                                            : index + 1}
+                                                    </td>
+
+                                                    <td>
+                                                        <span
+                                                            className="leaderboard-player"
+                                                            style={{
+                                                                color:
+                                                                    item.color ||
+                                                                    "#69db7c"
+                                                            }}
+                                                        >
+                                                            {item.character ||
+                                                                item.selectedCharacter ||
+                                                                "🦖"}{" "}
+                                                            {item.playerName ||
+                                                                item.name ||
+                                                                "Player"}
+                                                        </span>
+                                                    </td>
+
+                                                    <td className="leaderboard-score">
+                                                        {Number(
+                                                            item.score || 0
+                                                        ).toLocaleString()}
+                                                    </td>
+
+                                                    <td>
+                                                        <span
+                                                            className={
+                                                                status === "Playing"
+                                                                    ? "status-playing"
+                                                                    : status === "Dead"
+                                                                    ? "status-dead"
+                                                                    : "status-unknown"
+                                                            }
+                                                        >
+                                                            {status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </>
                 )}
 
                 <button
