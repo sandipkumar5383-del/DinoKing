@@ -27,12 +27,11 @@ const ScoreSchema = new mongoose.Schema(
 
         character: {
             type: String,
-            default: "🦖"
         },
 
         color: {
             type: String,
-            default: "#69db7c"
+
         },
 
         status: {
